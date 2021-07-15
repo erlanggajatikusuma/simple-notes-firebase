@@ -1,13 +1,18 @@
 import React from 'react'
+import { connect } from 'react-redux';
 
-const Login = () => {
+const Login = (props) => {
     return (
         <div>
-            <p>Login Page</p>
+            <p>Login Page {props.popupProps}</p>
             <button>Go to register</button>
             <button>Go to Dashboard</button>
         </div>
     )
 }
 
-export default Login;
+const reduxState = (state) => ({
+    popupProps: state.popup
+})
+
+export default connect(reduxState, null)(Login);
