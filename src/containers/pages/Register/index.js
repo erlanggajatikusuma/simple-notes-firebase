@@ -1,11 +1,17 @@
 import React, {useState} from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from "react-router-dom";
 import './Register.scss'
 import firebase from '../../../config/firebase';
+import Button from '../../../components/atoms/Button';
 
 const Register = () => {
+    const initState = useSelector((state) => state);
+    const history = useHistory();
+    const dispatch = useDispatch();
     const [state, setState] = useState({
         email: '',
-        password: ''
+        password: '',
     })
 
     const handleChangeText = (e) => {
@@ -15,21 +21,23 @@ const Register = () => {
         })
     }
 
-    const handleRegisterSubmit = () => {
-        console.log('email: ', state.email)
-        console.log('password: ', state.password)
-        firebase.auth().createUserWithEmailAndPassword(state.email, state.password)
+    const handleRegisterSubmit = async () => {
+        dispatch({type: 'SET_LOADING', value: true});
+        await firebase.auth().createUserWithEmailAndPassword(state.email, state.password)
             .then((userCredential) => {
                 // Signed in 
                 var user = userCredential.user;
                 console.log('SUCCESS REGISTER.......', userCredential)
                 console.log('SUCCESS REGISTER 2.......', user)
-                // ...
+                setState({...state, email: '', password: ''})
+                dispatch({type: 'SET_LOADING', value: false});
+                history.push('/login')
             })
             .catch((error) => {
                 var errorCode = error.code;
                 var errorMessage = error.message;
                 console.log('ERROR REGISTER......', errorCode, errorMessage)
+                dispatch({type: 'SET_LOADING', value: false});
             });
 
     }
@@ -37,11 +45,10 @@ const Register = () => {
         <div className="auth-container">
             <div className="auth-card">
                 <p className="auth-title">Register Page</p>
-                <input className="input" id="email" placeholder="Email" type="text" onChange={handleChangeText} />
-                <input className="input" id="password" placeholder="Password" type="password" onChange={handleChangeText} />
-                <button className="btn" onClick={handleRegisterSubmit}>Register</button>
+                <input className="input" id="email" placeholder="Email" type="text" onChange={handleChangeText} value={state.email} />
+                <input className="input" id="password" placeholder="Password" type="password" onChange={handleChangeText} value={state.password} />
+                <Button onClick={handleRegisterSubmit} title="Register" loading={initState.loading} />
             </div>
-            {/* <button>Go to Dashboard</button> */}
         </div>
     )
 }
