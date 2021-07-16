@@ -67,6 +67,12 @@ const Dashboard = () => {
     const cancelUpdate = () => {
         setState({...state, textButton: 'Simpan', title: '', content: ''})
     }
+
+    const deleteNote = (e, note) => {
+        e.stopPropagation()
+        console.log(note)
+        database.ref(`notes/${state.uid}/${note.id}`).remove()
+    }
     return (
         <div className="container">
             <div className="input-form">
@@ -90,6 +96,7 @@ const Dashboard = () => {
                                 <p className="title">{note.data.title}</p>
                                 <p className="date">{note.data.date}</p>
                                 <p className="content">{note.data.content}</p>
+                                <div className="delete-btn" onClick={(e) => deleteNote(e, note)}>x</div>
                             </div>
                         )
                     })}
